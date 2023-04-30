@@ -1,0 +1,7 @@
+#!/bin/sh
+read -p "choose episode (1-13): " ep
+url="https://api.consumet.org/anime/gogoanime/watch/serial-experiments-lain-episode-$ep"
+response=$(curl -s "$url" -G -d "server=gogocdn")
+referer=$(echo "$response" | jq -r '.headers.Referer')
+link=$(echo "$response" | jq -r '.sources[] | select(.quality == "default") | .url')
+mpv "$link" --http-header-fields="Referer: $referer"
