@@ -1,7 +1,5 @@
 #!/bin/sh
-read -p "choose episode (1-13): " ep
+read -p "Choose episode (1-13): " ep
 url="https://api.consumet.org/anime/gogoanime/watch/serial-experiments-lain-episode-$ep"
-response=$(curl -s "$url" -G -d "server=gogocdn")
-referer=$(echo "$response" | jq -r '.headers.Referer')
-link=$(echo "$response" | jq -r '.sources[] | select(.quality == "default") | .url')
-mpv "$link" --http-header-fields="Referer: $referer"
+referer=$(curl -sIL "$url" | awk '/^Referer:/ {print $2}')
+mpv $(curl -s "$url" -G -d "server=gogocdn" | jq -r '.sources[] | select(.quality == "default") | .url') --http-header-fields="Referer: $referer"
